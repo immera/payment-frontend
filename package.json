@@ -1,0 +1,22 @@
+{
+  "name": "payment-frontend",
+  "version": "1.0.0",
+  "description": "Helper function to use for make payment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdiechaHK/pkg-payment-frontend.git"
+  },
+  "keywords": [
+    "payment"
+  ],
+  "author": "Adiecha Harikrusha <adiechahari@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AdiechaHK/pkg-payment-frontend/issues"
+  },
+  "homepage": "https://github.com/AdiechaHK/pkg-payment-frontend#readme"
+}
