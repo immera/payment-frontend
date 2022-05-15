@@ -4,6 +4,12 @@ This package is specifically to used with laravel backed package in order to han
 
 ## Configuration
 
+Setting up `.env` variables, as of now we are required these 3 variable to be set as environment variable
+
+`STRIPE_PUBLIC` - publishable key provided from the stripe.
+`THANKYOU_PAGE` - page to be display after completion of payment (successfully or unsuccessfully)
+`BACKEND_API` - api end point where your server part will communcate with this package.
+
 ## Dependancies
 
 ### stripe
