@@ -75,7 +75,7 @@ const Payment = function(settings, axios) {
         let {amount, currency} = options;
         this._stripe.createSource({
           type: 'multibanco',
-          amount, currency
+          amount, currency,
           owner: {
             name: 'Jenny Rosen',
             email: 'jenny.rosen@example.com',
