@@ -93,7 +93,7 @@ const payment = new Payment({
     key: this.$config.STRIPE_PUBLIC,
     api: this.$config.BACKEND_API,
     callback: this.$config.THANKYOU_PAGE
-});
+}, axios);
 ```
 
 You can also store this payment object to page level variable.
@@ -110,3 +110,44 @@ this.payment.pay({
     currency: "eur"
 });
 ```
+
+### Wechat Pay Payment
+
+```js
+this.payment.pay({
+    payment_method: "wechat_pay",
+    amount: 1999, // here the amount will be in the smallest unit of currency.
+    currency: "eur"
+});
+```
+
+### Card Payment
+
+```js
+this.payment.pay({
+    payment_method: "card",
+    amount: 1999, // here the amount will be in the smallest unit of currency.
+    currency: "eur"
+});
+```
+
+### Multibanco Payment
+
+```js
+this.payment.pay({
+    payment_method: "multibanco",
+    amount: 1999, // here the amount will be in the smallest unit of currency.
+    currency: "eur",
+    name: "Harikrushna Adiecha",
+    email: "adiechahari@gmail.com"
+});
+```
+
+### Bank Transfer / Manual Payment / Cash payment
+
+-- need to implement yet.
+
+
+### Paypal Payment
+
+--- need to implement yet.

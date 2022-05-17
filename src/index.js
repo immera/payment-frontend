@@ -72,14 +72,11 @@ const Payment = function(settings, axios) {
           })
       },
       multibanco: function(options) {
-        let {amount, currency} = options;
+        let {amount, currency, name, email} = options;
         this._stripe.createSource({
           type: 'multibanco',
           amount, currency,
-          owner: {
-            name: 'Jenny Rosen',
-            email: 'jenny.rosen@example.com',
-          },
+          owner: { name, email },
           redirect: {
             return_url: `{this._settings.api}/payment/webhook`,
           },
