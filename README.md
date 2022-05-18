@@ -145,9 +145,9 @@ this.payment.pay({
 
 ### Bank Transfer / Manual Payment / Cash payment
 
--- need to implement yet.
+-- not yet implemented.
 
 
 ### Paypal Payment
 
---- need to implement yet.
+--- not yet implemented.
