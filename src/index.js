@@ -12,7 +12,7 @@ const Payment = function(settings, axios) {
         })
       },
       alipay: function(options) {
-        this._requestPayment('alipay', options)
+        return this._requestPayment('alipay', options)
           .then(({data}) => {
             this._stripe.confirmAlipayPayment(
               data.response.client_secret, {
@@ -27,7 +27,7 @@ const Payment = function(settings, axios) {
           })
       },
       wechat_pay: function(options) {
-        this._requestPayment('wechat_pay', options)
+        return this._requestPayment('wechat_pay', options)
           .then(({data}) => {
             this._stripe.confirmWechatPayPayment(
               data.response.client_secret,
@@ -55,7 +55,7 @@ const Payment = function(settings, axios) {
         this.cardElem.mount(cardId)
       },
       card: function(options) {
-        this._requestPayment('card', options)
+        return this._requestPayment('card', options)
           .then(({data}) => {
             this._stripe.confirmCardPayment(
               data.response.client_secret, {
@@ -72,18 +72,19 @@ const Payment = function(settings, axios) {
           })
       },
       multibanco: function(options) {
-        let {amount, currency, name, email} = options;
-        this._stripe.createSource({
-          type: 'multibanco',
-          amount, currency,
-          owner: { name, email },
-          redirect: {
-            return_url: `{this._settings.api}/payment/webhook`,
-          },
-        }).then(console.log);
+        return this._requestPayment('multibanco', options)
+          .then(({data}) => data.response)
+          .then(({
+            multibanco, status, currency, amount
+          }) => ({
+            multibanco: {
+              entity: multibanco.entity,
+              reference: multibanco.reference
+            }, status, currency, amount
+          }))
       },
       pay: function({payment_method, ...options}) {
-        this[payment_method](options)
+        return this[payment_method](options)
       }
     }
   }
