@@ -93,7 +93,7 @@ const payment = new Payment({
     key: this.$config.STRIPE_PUBLIC,
     api: this.$config.BACKEND_API,
     callback: this.$config.THANKYOU_PAGE
-}, axios);
+}, this.$axios);
 ```
 
 You can also store this payment object to page level variable.
