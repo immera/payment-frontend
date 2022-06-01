@@ -86,7 +86,7 @@ basically we need to follow 2 steps to make payment,
 
 To initialise payment you need to create new `Payment` object and store it as you needed. (you may store it into the vue store or if you are using it in a single page then you can also store it in the page level variable.)
 
-here you only need to take care of `initCard()` method to be call if you are using card payment. mode detail in [Card Payment](#card-payment) section
+here you only need to take care of `initCard("#card")` method to be call if you are using card payment. mode detail in [Card Payment](#card-payment) section
 
 ```js
 const payment = new Payment({
@@ -107,7 +107,12 @@ this.payment = payment
 this.payment.pay({
     payment_method: "alipay",
     amount: 1999, // here the amount will be in the smallest unit of currency.
-    currency: "eur"
+    currency: "eur",
+    additional_info: {
+        // ...
+        // Whatever you want in the backend event handler you can add them here
+        // ...
+    }
 });
 ```
 
@@ -117,19 +122,49 @@ this.payment.pay({
 this.payment.pay({
     payment_method: "wechat_pay",
     amount: 1999, // here the amount will be in the smallest unit of currency.
-    currency: "eur"
+    currency: "eur",
+    additional_info: {
+        // ...
+        // Whatever you want in the backend event handler you can add them here
+        // ...
+    }
 });
 ```
 
 ### Card Payment
 
-```js
-this.payment.pay({
-    payment_method: "card",
-    amount: 1999, // here the amount will be in the smallest unit of currency.
-    currency: "eur"
-});
+when using this payment method make sure you are calling `initCard("#card")` method at the time of mounting the component / page.   
+
+`initCard` method accepts one string argument which should be id of an empty div (where you expect to load details of card.) as shown in bellow.
+
+```html
+<div id="card"></div>
+<button @click="pay"> Pay <button>
 ```
+
+```js
+mounted() {
+    this.payment = new Payment(...) // Create payment object
+    this.payment.initCard("#card")
+},
+methods: {
+    pay() {
+        this.payment.pay({
+            payment_method: "card",
+            amount: 1999, // here the amount will be in the smallest unit of currency.
+            currency: "eur",
+            additional_info: {
+                // ...
+                // Whatever you want in the backend event handler you can add them here
+                // ...
+            }
+        })
+    }
+}
+```
+
+In case you want to show card input only when card method is selected then it's adviced to use `v-show` to make them visible and invisible, this will keep your content (card initialization from stripe side) safe.
+
 
 ### Multibanco Payment
 
@@ -139,15 +174,59 @@ this.payment.pay({
     amount: 1999, // here the amount will be in the smallest unit of currency.
     currency: "eur",
     name: "Harikrushna Adiecha",
-    email: "adiechahari@gmail.com"
+    email: "adiechahari@gmail.com",
+    additional_info: {
+        // ...
+        // Whatever you want in the backend event handler you can add them here
+        // ...
+    }
 });
 ```
 
 ### Bank Transfer / Manual Payment / Cash payment
 
--- not yet implemented.
+Here we consider this method as `cash` payment. that can include bank transfer or any kind of manual fund transfer. in this case you supposed to be acknoledge from the frontend.
+
+**Initialise Payment**
+
+```js
+this.payment.pay({
+    payment_method: "cash",
+    amount: 1999, // here the amount will be in the smallest unit of currency.
+    currency: "eur",
+    additional_info: {
+        // ...
+        // Whatever you want in the backend event handler you can add them here
+        // ...
+    }
+});
+```
+
+**Acknoledge Payment**
+
+This part must be done from the admin side. make sure this function call will be done from the admin side.
+
+```js
+this.payment.ack(123) // here the argument will be id of payment
+```
+
+when this method get called it will be considered to be successful payment.
+
+To get all transaction check out `get` [method](#get_method)
 
 
 ### Paypal Payment
 
 --- not yet implemented.
+
+
+### get method
+
+here we expose an function call that will actually call backend api to get all the transactions.
+
+```js
+let pay = new Payment(...) // Create payment object
+query = {payment_method: "cash"}
+pay.get(query)
+
+```

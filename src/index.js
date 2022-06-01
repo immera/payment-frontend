@@ -85,6 +85,12 @@ const Payment = function(settings, axios) {
       },
       pay: function({payment_method, ...options}) {
         return this[payment_method](options)
+      },
+      ack: function(id, status) {
+        return this._axios.put(`/payment/instances/${id}/ack`, {status})
+      },
+      get: function(query) {
+        return this._axios.get(`/payment/instances`, query)
       }
     }
   }
