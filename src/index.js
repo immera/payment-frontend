@@ -1,8 +1,10 @@
+const { loadScript } = require("@paypal/paypal-js");
 
 const Payment = function(settings, axios) {
     this._settings = settings;
     this._axios = axios;
     this._stripe = Stripe(settings.key)
+    this.paypal = null
     this.__proto__ = {
       _requestPayment: function(payment_method, options) {
         return this._axios.post('/payment/request', {
@@ -53,6 +55,61 @@ const Payment = function(settings, axios) {
         let element = this._stripe.elements();
         this.cardElem = element.create('card');
         this.cardElem.mount(cardId)
+      },
+      initPaypalBtn: function(btnId, {currency, amount}, options = {}) {
+        currency = currency.toUpperCase()
+        amount = (number(amount)/100).toFixed(2);
+
+        try {
+          this.paypal = await loadScript({ "client-id": "test" , "currency": currency });
+        } catch (error) {
+          console.error("failed to load the PayPal JS SDK script", error);
+        }
+        if (paypal) {
+          try {
+            await this.paypal.Buttons({
+              style: {
+                layout: 'horizontal',
+                color: "blue",
+                tagline: false,
+              },
+              createOrder: function(data, actions) {
+                // Set up the transaction
+                return actions.order.create({
+                  purchase_units: [{
+                    amount: {
+                      currency_code: currency,
+                      value: amount
+                    }
+                  }]
+                });
+              },
+              onApprove: function(data, actions) {
+                // This function captures the funds from the transaction.
+                return actions.order.capture().then(function(details) {
+                  // This function shows a transaction success message to your buyer.
+                  alert('Transaction completed by ' + details.payer.name.given_name);
+                });
+              },
+              onCancel: function (data) {
+                // Show a cancel page, or return to cart
+                console.log("Cancelled !!!", data)
+              },
+              onError: function (err) {
+                // For example, redirect to a specific error page
+                console.error(err)
+                // window.location.href = "/your-error-page-here";
+              }
+            }).render(btnId);
+          } catch (error) {
+            console.error("failed to render the PayPal Buttons", error);
+          }
+      }
+  
+
+
+
+
       },
       card: function(options) {
         return this._requestPayment('card', options)

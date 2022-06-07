@@ -1,6 +1,6 @@
 {
   "name": "payment-frontend",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Helper function to use for make payment",
   "main": "src/index.js",
   "scripts": {
@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/AdiechaHK/pkg-payment-frontend/issues"
   },
-  "homepage": "https://github.com/AdiechaHK/pkg-payment-frontend#readme"
+  "homepage": "https://github.com/AdiechaHK/pkg-payment-frontend#readme",
+  "dependencies": {
+    "@paypal/paypal-js": "^5.0.6"
+  }
 }
