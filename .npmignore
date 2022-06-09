@@ -1,7 +1,9 @@
 /node_modules/
 /.cache
+/.github
 /docs
 .editorconfig
 .eslintrc.json
 webpack.config.js
 *.code-workspace
+*LICENSE.txt
