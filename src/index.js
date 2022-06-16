@@ -1,12 +1,11 @@
 const { loadScript } = require('@paypal/paypal-js');
 
-const Payment = (settings, axios) => {
+const Payment = function(settings, axios) {
   this.settings = settings;
-  // TODO remove axios and use fetch instead
   this.axios = axios;
-  // TODO import Stripe(?)
   this.stripe = Stripe(settings.key);
   this.paypal = null;
+  this.customer = settings.customer
 
   // TODO remove __proto__ and declare methods in a class
   this.__proto__ = {
@@ -16,6 +15,13 @@ const Payment = (settings, axios) => {
         payment_method,
         ...options,
       });
+    },
+
+    cardList() {
+      return this.axios.get('/payment/cards')
+    },
+    createNewCard(cardData) {
+      this.axios.post('/payment/cards', {...cardData}).then(console.log).catch(console.error)
     },
 
     alipay(options) {
@@ -56,6 +62,7 @@ const Payment = (settings, axios) => {
       });
     },
 
+    // No need to use this init card method, as we maintain card crud.
     initCard(cardId) {
       const element = this.stripe.elements();
       this.cardElem = element.create('card');
@@ -85,6 +92,8 @@ const Payment = (settings, axios) => {
               },
               createOrder(data, actions) {
                 // Set up the transaction
+                const pkgResponse = this.requestPayment("paypal", {})
+                return pkgResponse.response;
                 return actions.order.create({
                   purchase_units: [
                     {
@@ -123,7 +132,8 @@ const Payment = (settings, axios) => {
       }
     },
 
-    card(options) {
+    // Depricated way of making card payment
+    cardDepricated(options) {
       return this.requestPayment('card', options).then(({ data }) => {
         this.stripe
           .confirmCardPayment(data.response.client_secret, {
@@ -141,6 +151,12 @@ const Payment = (settings, axios) => {
       });
     },
 
+    card(options) {
+      return this.requestPayment('card', options)
+        .then(console.log)
+        .catch(console.error);
+    },
+    
     multibanco(options) {
       return this.requestPayment('multibanco', options)
         .then(({ data }) => data.response)
