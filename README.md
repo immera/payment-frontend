@@ -92,9 +92,15 @@ here you only need to take care of `initCard("#card")` method to be call if you 
 const payment = new Payment({
     key: this.$config.STRIPE_PUBLIC,
     api: this.$config.BACKEND_API,
-    callback: this.$config.THANKYOU_PAGE
+    callback: this.$config.THANKYOU_PAGE,
+    customer: {
+        email: "harikrushna@twopeople.company",
+        name: "Harikrushna"
+    }
 }, this.$axios);
 ```
+
+**Make sure the customer you are setting is same as logged in user, to make it work smoothly.**
 
 You can also store this payment object to page level variable.
 ```js
@@ -133,6 +139,39 @@ this.payment.pay({
 
 ### Card Payment
 
+for making card payment you need to have all cards list which is added for that customer
+
+so here is the method to get all cards.
+```js
+this.payment.cardList()
+```
+this method returns a promise, so you can wait for response or you can write then to handle response.
+
+using this method you will get all the cards which is belongs to the initialized customer.
+
+_**Note:** Initilized custimer will be set at the time of initialization_
+
+Once you have list of cards, you can display them how ever you want to display according to your ui. when you want to make payment using card you supposed to be do it as bellow.
+
+```js
+this.payment.pay({
+    payment_method: "card",
+    amount: 1999, // here the amount will be in the smallest unit of currency.
+    currency: "eur",
+    source: "card_some_random_key", // card id will be pass here.
+    additional_info: {
+        // ...
+        // Whatever you want in the backend event handler you can add them here
+        // ...
+    }
+});
+
+```
+
+<!-- Depricated card payment -->
+<!-- 
+### Card Payment
+
 when using this payment method make sure you are calling `initCard("#card")` method at the time of mounting the component / page.   
 
 `initCard` method accepts one string argument which should be id of an empty div (where you expect to load details of card.) as shown in bellow.
@@ -164,7 +203,7 @@ methods: {
 ```
 
 In case you want to show card input only when card method is selected then it's adviced to use `v-show` to make them visible and invisible, this will keep your content (card initialization from stripe side) safe.
-
+ -->
 
 ### Multibanco Payment
 
@@ -173,8 +212,6 @@ this.payment.pay({
     payment_method: "multibanco",
     amount: 1999, // here the amount will be in the smallest unit of currency.
     currency: "eur",
-    name: "Harikrushna Adiecha",
-    email: "adiechahari@gmail.com",
     additional_info: {
         // ...
         // Whatever you want in the backend event handler you can add them here
