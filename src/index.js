@@ -5,7 +5,7 @@ const Payment = function(settings, axios) {
   this.axios = axios;
   this.stripe = Stripe(settings.key);
   this.paypal = null;
-  this.customer = settings.customer
+  this.customer = settings.customer;
 
   // TODO remove __proto__ and declare methods in a class
   this.__proto__ = {
@@ -77,7 +77,7 @@ const Payment = function(settings, axios) {
 
       try {
         this.paypal = await loadScript({
-          'client-id': 'test',
+          'client-id': paymentPkg.settings.paypalClientId,
           currency,
         });
       } catch (error) {
@@ -92,7 +92,7 @@ const Payment = function(settings, axios) {
                 color: 'blue',
                 tagline: false,
               },
-              async createOrder(data, actions) {
+              createOrder(data, actions) {
                 // Set up the transaction
                 console.log("Create Order Data:", data);
                 return paymentPkg.requestPayment("paypal", {currency, amount})
@@ -101,23 +101,17 @@ const Payment = function(settings, axios) {
                   .catch(console.error);
               },
               onApprove(data, actions) {
-                // This function captures the funds from the transaction.
-                console.log(data)
-                // return paymentPkg.axios('payment/paypal/order/{order}/capture')
-                return actions.order.capture().then(details => {
-                  // This function shows a transaction success message to your buyer.
-                  // TODO emit event
-                  console.log(
-                    `Transaction completed by ${details.payer.name.given_name}`
-                  );
-                });
+                return paymentPkg.axios.post(`payment/paypal/order/${data.orderID}/capture`)
+                  .then(console.log)
+                  .catch(console.error);
               },
-              onCancel(data) {
+              onCancel({orderID}) {
                 // Show a cancel page, or return to cart
                 paymentPkg.axios.post('/payment/callback', {
-                  payment_method: "paypal",
-                  status: "canceled"
-                })
+                  payment_intent: orderID,
+                  redirect_status: "canceled",
+                  dont_redirect: true
+                });
 
               },
               onError(err) {
