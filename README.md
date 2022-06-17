@@ -165,45 +165,17 @@ this.payment.pay({
         // ...
     }
 });
-
 ```
 
-<!-- Depricated card payment -->
-<!-- 
-### Card Payment
-
-when using this payment method make sure you are calling `initCard("#card")` method at the time of mounting the component / page.   
-
-`initCard` method accepts one string argument which should be id of an empty div (where you expect to load details of card.) as shown in bellow.
-
-```html
-<div id="card"></div>
-<button @click="pay"> Pay <button>
-```
+**Add new Card** In order to add new card, you can use the following code.
 
 ```js
-mounted() {
-    this.payment = new Payment(...) // Create payment object
-    this.payment.initCard("#card")
-},
-methods: {
-    pay() {
-        this.payment.pay({
-            payment_method: "card",
-            amount: 1999, // here the amount will be in the smallest unit of currency.
-            currency: "eur",
-            additional_info: {
-                // ...
-                // Whatever you want in the backend event handler you can add them here
-                // ...
-            }
-        })
-    }
-}
+this.payment.createNewCard({
+    "number": "5555555555554444", // Card number 16 digit
+    "expiry_date": "11/2027", // Expiry MM/YYYY, as given example
+    "cvc": "123" // 3 digit CVC code
+});
 ```
-
-In case you want to show card input only when card method is selected then it's adviced to use `v-show` to make them visible and invisible, this will keep your content (card initialization from stripe side) safe.
- -->
 
 ### Multibanco Payment
 
@@ -254,8 +226,20 @@ To get all transaction check out `get` [method](#get_method)
 
 ### Paypal Payment
 
---- not yet implemented.
+To make payment using paypal, we need to use their button ui as it is, so in order to place the button, we need to specify it's container as bellow.
 
+```html
+<div id="paypal-container"></div>
+```
+
+and initialize the paypal payment using following code.
+
+```js
+this.payment.initPaypalBtn("#paypal-container", {
+    currency: "eur",
+    amount: 100 // Make sure whatever the value we given here will be devided by 100 and send float value to the actual api
+});
+```
 
 ### get method
 
