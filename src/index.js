@@ -71,7 +71,9 @@ const Payment = function(settings, axios) {
 
     async initPaypalBtn(btnId, { currency, amount }) {
       currency = currency.toUpperCase();
-      amount = (number(amount) / 100).toFixed(2);
+      amount = (Number(amount) / 100).toFixed(2);
+
+      paymentPkg = this;
 
       try {
         this.paypal = await loadScript({
@@ -90,23 +92,18 @@ const Payment = function(settings, axios) {
                 color: 'blue',
                 tagline: false,
               },
-              createOrder(data, actions) {
+              async createOrder(data, actions) {
                 // Set up the transaction
-                const pkgResponse = this.requestPayment("paypal", {})
-                return pkgResponse.response;
-                return actions.order.create({
-                  purchase_units: [
-                    {
-                      amount: {
-                        currency_code: currency,
-                        value: amount,
-                      },
-                    },
-                  ],
-                });
+                console.log("Create Order Data:", data);
+                return paymentPkg.requestPayment("paypal", {currency, amount})
+                  .then(({data}) => data.response)
+                  .then(({id}) => id)
+                  .catch(console.error);
               },
               onApprove(data, actions) {
                 // This function captures the funds from the transaction.
+                console.log(data)
+                // return paymentPkg.axios('payment/paypal/order/{order}/capture')
                 return actions.order.capture().then(details => {
                   // This function shows a transaction success message to your buyer.
                   // TODO emit event
@@ -117,7 +114,11 @@ const Payment = function(settings, axios) {
               },
               onCancel(data) {
                 // Show a cancel page, or return to cart
-                console.log('Cancelled !!!', data);
+                paymentPkg.axios.post('/payment/callback', {
+                  payment_method: "paypal",
+                  status: "canceled"
+                })
+
               },
               onError(err) {
                 // For example, redirect to a specific error page
@@ -156,7 +157,7 @@ const Payment = function(settings, axios) {
         .then(console.log)
         .catch(console.error);
     },
-    
+
     multibanco(options) {
       return this.requestPayment('multibanco', options)
         .then(({ data }) => data.response)
