@@ -89,7 +89,7 @@ const Payment = function(settings, axios) {
             .Buttons({
               style: {
                 layout: 'horizontal',
-                color: 'blue',
+                color: 'black',
                 tagline: false,
               },
               async createOrder(data, actions) {
@@ -102,15 +102,20 @@ const Payment = function(settings, axios) {
               },
               onApprove(data, actions) {
                 // This function captures the funds from the transaction.
-                console.log(data)
-                // return paymentPkg.axios('payment/paypal/order/{order}/capture')
-                return actions.order.capture().then(details => {
-                  // This function shows a transaction success message to your buyer.
-                  // TODO emit event
-                  console.log(
-                    `Transaction completed by ${details.payer.name.given_name}`
-                  );
-                });
+                const { orderID } = data
+                return paymentPkg.axios.post(`payment/paypal/order/${orderID}/capture`)
+                  .then(console.log)
+                  .then(res => {
+                    window.location.href = paymentPkg.settings.callback
+                  })
+                  .catch(console.error)
+                // return actions.order.capture().then(details => {
+                //   // This function shows a transaction success message to your buyer.
+                //   // TODO emit event
+                //   console.log(
+                //     `Transaction completed by ${details.payer.name.given_name}`
+                //   );
+                // });
               },
               onCancel(data) {
                 // Show a cancel page, or return to cart
@@ -174,6 +179,10 @@ const Payment = function(settings, axios) {
 
     pay({ payment_method, ...options }) {
       return this[payment_method](options);
+    },
+
+    cash(options) {
+      return this.requestPayment('cash', options);
     },
 
     ack(id, status) {
