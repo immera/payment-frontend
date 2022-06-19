@@ -170,6 +170,10 @@ const Payment = function(settings, axios) {
       return this[payment_method](options);
     },
 
+    cash(options) {
+      return this.requestPayment('cash', options);
+    },
+
     ack(id, status) {
       return this.axios.put(`/payment/instances/${id}/ack`, { status });
     },
