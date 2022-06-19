@@ -5,7 +5,7 @@ const Payment = function(settings, axios) {
   this.axios = axios;
   this.stripe = Stripe(settings.key);
   this.paypal = null;
-  this.customer = settings.customer
+  this.customer = settings.customer;
 
   // TODO remove __proto__ and declare methods in a class
   this.__proto__ = {
@@ -77,7 +77,7 @@ const Payment = function(settings, axios) {
 
       try {
         this.paypal = await loadScript({
-          'client-id': 'test',
+          'client-id': paymentPkg.settings.paypalClientId,
           currency,
         });
       } catch (error) {
@@ -92,7 +92,7 @@ const Payment = function(settings, axios) {
                 color: 'black',
                 tagline: false,
               },
-              async createOrder(data, actions) {
+              createOrder(data, actions) {
                 // Set up the transaction
                 console.log("Create Order Data:", data);
                 return paymentPkg.requestPayment("paypal", {currency, amount})
@@ -117,12 +117,13 @@ const Payment = function(settings, axios) {
                 //   );
                 // });
               },
-              onCancel(data) {
+              onCancel({orderID}) {
                 // Show a cancel page, or return to cart
                 paymentPkg.axios.post('/payment/callback', {
-                  payment_method: "paypal",
-                  status: "canceled"
-                })
+                  payment_intent: orderID,
+                  redirect_status: "canceled",
+                  dont_redirect: true
+                });
 
               },
               onError(err) {
