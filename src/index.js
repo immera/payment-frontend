@@ -89,7 +89,7 @@ const Payment = function(settings, axios) {
             .Buttons({
               style: {
                 layout: 'horizontal',
-                color: 'blue',
+                color: 'black',
                 tagline: false,
               },
               createOrder(data, actions) {
@@ -101,9 +101,21 @@ const Payment = function(settings, axios) {
                   .catch(console.error);
               },
               onApprove(data, actions) {
-                return paymentPkg.axios.post(`payment/paypal/order/${data.orderID}/capture`)
+                // This function captures the funds from the transaction.
+                const { orderID } = data
+                return paymentPkg.axios.post(`payment/paypal/order/${orderID}/capture`)
                   .then(console.log)
-                  .catch(console.error);
+                  .then(res => {
+                    window.location.href = paymentPkg.settings.callback
+                  })
+                  .catch(console.error)
+                // return actions.order.capture().then(details => {
+                //   // This function shows a transaction success message to your buyer.
+                //   // TODO emit event
+                //   console.log(
+                //     `Transaction completed by ${details.payer.name.given_name}`
+                //   );
+                // });
               },
               onCancel({orderID}) {
                 // Show a cancel page, or return to cart
