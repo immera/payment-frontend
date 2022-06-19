@@ -23,6 +23,9 @@ const Payment = function(settings, axios) {
     createNewCard(cardData) {
       this.axios.post('/payment/cards', {...cardData}).then(console.log).catch(console.error)
     },
+    deleteCard(card) {
+      return this.axios.delete(`/payment/cards/${card}`).then(console.log).catch(console.error)
+    },
 
     alipay(options) {
       return this.requestPayment('alipay', options).then(({ data }) => {
