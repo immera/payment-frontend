@@ -185,6 +185,10 @@ const Payment = function(settings, axios) {
       return this[payment_method](options);
     },
 
+    bank_transfer(options) {
+      return this.requestPayment('bank_transfer', options);
+    },
+
     cash(options) {
       return this.requestPayment('cash', options);
     },
