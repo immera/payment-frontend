@@ -1,6 +1,6 @@
 {
   "name": "@immera/payment-frontend",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Helper function to use for make payment",
   "main": "src/index.js",
   "scripts": {
@@ -16,6 +16,9 @@
   ],
   "author": "immera.io <hello@immera.io>",
   "license": "MIT",
+  "publishConfig": {
+    "@immera:registry": "https://npm.pkg.github.com"
+  },
   "bugs": {
     "url": "https://github.com/immera/payment-frontend/issues"
   },
