@@ -4,7 +4,6 @@ const Payment = function(settings, axios) {
   this.settings = settings;
   this.axios = axios;
   this.stripe = Stripe(settings.key);
-  this.paypal = null;
   this.customer = settings.customer;
 
   // TODO remove __proto__ and declare methods in a class
@@ -73,13 +72,14 @@ const Payment = function(settings, axios) {
     },
 
     async initPaypalBtn(btnId, { currency, amount }) {
-      currency = currency.toUpperCase();
-      amount = (Number(amount) / 100).toFixed(2);
+      let currency = currency.toUpperCase();
+      let amount = (Number(amount) / 100).toFixed(2);
 
-      paymentPkg = this;
+      let paymentPkg = this;
+      let paypal = null;
 
       try {
-        this.paypal = await loadScript({
+        paypal = await loadScript({
           'client-id': paymentPkg.settings.paypalClientId,
           currency,
         });
@@ -88,7 +88,7 @@ const Payment = function(settings, axios) {
       }
       if (paypal) {
         try {
-          await this.paypal
+          await paypal
             .Buttons({
               style: {
                 layout: 'horizontal',
