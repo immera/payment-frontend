@@ -72,8 +72,8 @@ const Payment = function(settings, axios) {
     },
 
     async initPaypalBtn(btnId, { currency, amount }) {
-      let currency = currency.toUpperCase();
-      let amount = (Number(amount) / 100).toFixed(2);
+      currency = currency.toUpperCase();
+      amount = (Number(amount) / 100).toFixed(2);
 
       let paymentPkg = this;
       let paypal = null;
