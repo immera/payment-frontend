@@ -20,25 +20,17 @@ const Payment = function(settings, axios) {
       return this.axios.get('/payment/cards')
     },
     createNewCard(cardData) {
-      this.axios.post('/payment/cards', {...cardData}).then(console.log).catch(console.error)
+      return this.axios.post('/payment/cards', {...cardData})
     },
     deleteCard(card) {
-      return this.axios.delete(`/payment/cards/${card}`).then(console.log).catch(console.error)
+      return this.axios.delete(`/payment/cards/${card}`)
     },
-
     alipay(options) {
       return this.requestPayment('alipay', options).then(({ data }) => {
         this.stripe
           .confirmAlipayPayment(data.response.client_secret, {
             return_url: data.callback,
           })
-          .then(result => {
-            if (result.error) {
-              // Inform the customer that there was an error.
-              console.error(error);
-            }
-          })
-          .catch(console.error);
       });
     },
 
@@ -71,7 +63,7 @@ const Payment = function(settings, axios) {
       this.cardElem.mount(cardId);
     },
 
-    async initPaypalBtn(btnId, { currency, amount }) {
+    async initPaypalBtn(btnId, { currency, amount, callback }) {
       currency = currency.toUpperCase();
       amount = (Number(amount) / 100).toFixed(2);
 
@@ -98,10 +90,10 @@ const Payment = function(settings, axios) {
               createOrder(data, actions) {
                 // Set up the transaction
                 console.log("Create Order Data:", data);
-                return paymentPkg.requestPayment("paypal", {currency, amount})
-                  .then(({data}) => data.response)
-                  .then(({id}) => id)
-                  .catch(console.error);
+                let { additional_info } = (typeof(callback) === 'function') ? (await callback()): {}
+                let resp = await paymentPkg.requestPayment("paypal", { currency, amount, additional_info })
+                console.log("Payment initiated with data - ", resp.data)
+                return resp.data.response.id
               },
               onApprove(data, actions) {
                 // This function captures the funds from the transaction.
@@ -163,7 +155,10 @@ const Payment = function(settings, axios) {
 
     card(options) {
       return this.requestPayment('card', options)
-        .then(console.log)
+        .then(res => {
+          console.log(res)
+          return res;
+        })
         .catch(console.error);
     },
 
