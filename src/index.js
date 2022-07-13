@@ -90,10 +90,18 @@ const Payment = function(settings, axios) {
               createOrder(data, actions) {
                 // Set up the transaction
                 console.log("Create Order Data:", data);
-                let { additional_info } = (typeof(callback) === 'function') ? (await callback()): {}
-                let resp = await paymentPkg.requestPayment("paypal", { currency, amount, additional_info })
-                console.log("Payment initiated with data - ", resp.data)
-                return resp.data.response.id
+                const getOrderId = ({additional_info}) => {
+                  return paymentPkg.requestPayment("paypal", { currency, amount, additional_info })
+                  .then(({data}) => data.response)
+                  .then(({id}) => id)
+                  .catch(console.error);
+                }
+                if(typeof(callback) == 'function') {
+                  return callback().then(getOrderId).catch(err => {
+                    console.log('Error: ', err)
+                  });
+                }
+                return getOrderId()
               },
               onApprove(data, actions) {
                 // This function captures the funds from the transaction.
