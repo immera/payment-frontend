@@ -1,6 +1,6 @@
 {
   "name": "@immera/payment-frontend",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Helper function to use for make payment",
   "main": "src/index.js",
   "scripts": {
