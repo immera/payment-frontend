@@ -107,7 +107,10 @@ const Payment = function(settings, axios) {
                 // This function captures the funds from the transaction.
                 const { orderID } = data
                 return paymentPkg.axios.post(`payment/paypal/order/${orderID}/capture`)
-                  .then(console.log)
+                  .then(order => {
+                    console.log(order)
+                    window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ status: 'SUCCESS' }))
+                  })
                   .then(res => {
                     window.location.href = paymentPkg.settings.callback
                   })
@@ -126,6 +129,8 @@ const Payment = function(settings, axios) {
                   payment_intent: orderID,
                   redirect_status: "canceled",
                   dont_redirect: true
+                }).then(res => {
+                  window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ status: 'CANCELLED' }));
                 });
 
               },
@@ -133,6 +138,8 @@ const Payment = function(settings, axios) {
                 // For example, redirect to a specific error page
                 console.error(err);
                 // window.location.href = "/your-error-page-here";
+                const msg = { err , status: 'FAILED' }
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(msg));
               },
             })
             .render(btnId);
