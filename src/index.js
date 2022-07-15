@@ -87,14 +87,14 @@ const Payment = function(settings, axios) {
                 color: 'black',
                 tagline: false,
               },
-              createOrder(data, actions) {
+              createOrder(data) {
                 // Set up the transaction
-                console.log("Create Order Data:", data);
+                console.log('Create Order Data:', data);
                 const getOrderId = ({additional_info}) => {
-                  return paymentPkg.requestPayment("paypal", { currency, amount, additional_info })
-                  .then(({data}) => data.response)
-                  .then(({id}) => id)
-                  .catch(console.error);
+                  return paymentPkg.requestPayment('paypal', { currency, amount, additional_info })
+                    .then(({data}) => data.response)
+                    .then(({id}) => id)
+                    .catch(console.error);
                 }
                 if(typeof(callback) == 'function') {
                   return callback().then(getOrderId).catch(err => {
@@ -103,12 +103,15 @@ const Payment = function(settings, axios) {
                 }
                 return getOrderId()
               },
-              onApprove(data, actions) {
+              onApprove(data) {
                 // This function captures the funds from the transaction.
                 const { orderID } = data
                 return paymentPkg.axios.post(`payment/paypal/order/${orderID}/capture`)
-                  .then(console.log)
-                  .then(res => {
+                  .then(order => {
+                    console.log(order)
+                    window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ status: 'SUCCESS' }))
+                  })
+                  .then(() => {
                     window.location.href = paymentPkg.settings.callback
                   })
                   .catch(console.error)
@@ -124,8 +127,10 @@ const Payment = function(settings, axios) {
                 // Show a cancel page, or return to cart
                 paymentPkg.axios.post('/payment/callback', {
                   payment_intent: orderID,
-                  redirect_status: "canceled",
+                  redirect_status: 'canceled',
                   dont_redirect: true
+                }).then(() => {
+                  window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ status: 'CANCELLED' }));
                 });
 
               },
@@ -133,6 +138,8 @@ const Payment = function(settings, axios) {
                 // For example, redirect to a specific error page
                 console.error(err);
                 // window.location.href = "/your-error-page-here";
+                const msg = { err , status: 'FAILED' }
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(msg));
               },
             })
             .render(btnId);
