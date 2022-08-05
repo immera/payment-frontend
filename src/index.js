@@ -1,6 +1,6 @@
 const { loadScript } = require('@paypal/paypal-js');
 
-const Payment = function(settings, axios) {
+const Payment = function (settings, axios) {
   this.settings = settings;
   this.axios = axios;
   this.stripe = Stripe(settings.key);
@@ -19,12 +19,15 @@ const Payment = function(settings, axios) {
     cardList() {
       return this.axios.get('/payment/cards');
     },
+
     createNewCard(cardData) {
-      return this.axios.post('/payment/cards', {...cardData});
+      return this.axios.post('/payment/cards', cardData);
     },
+
     deleteCard(card) {
       return this.axios.delete(`/payment/cards/${card}`);
     },
+
     alipay(options) {
       return this.requestPayment('alipay', options).then(({ data }) => {
         this.stripe
@@ -67,7 +70,7 @@ const Payment = function(settings, axios) {
       currency = currency.toUpperCase();
       amount = (Number(amount) / 100).toFixed(2);
 
-      let paymentPkg = this;
+      const paymentPkg = this;
       let paypal = null;
 
       try {
@@ -90,13 +93,11 @@ const Payment = function(settings, axios) {
               createOrder(data) {
                 // Set up the transaction
                 console.log('Create Order Data:', data);
-                const getOrderId = ({additional_info}) => {
-                  return paymentPkg.requestPayment('paypal', { currency, amount, additional_info })
-                    .then(({data}) => data.response)
-                    .then(({id}) => id)
-                    .catch(console.error);
-                };
-                if(typeof(callback) == 'function') {
+                const getOrderId = ({ additional_info }) => paymentPkg.requestPayment('paypal', { currency, amount, additional_info })
+                  .then(({ data }) => data.response)
+                  .then(({ id }) => id)
+                  .catch(console.error);
+                if (typeof (callback) === 'function') {
                   return callback().then(getOrderId).catch(err => {
                     console.log('Error: ', err);
                   });
@@ -123,22 +124,21 @@ const Payment = function(settings, axios) {
                 //   );
                 // });
               },
-              onCancel({orderID}) {
+              onCancel({ orderID }) {
                 // Show a cancel page, or return to cart
                 paymentPkg.axios.post('/payment/callback', {
                   payment_intent: orderID,
                   redirect_status: 'canceled',
-                  dont_redirect: true
+                  dont_redirect: true,
                 }).then(() => {
                   window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ status: 'CANCELLED' }));
                 });
-
               },
               onError(err) {
                 // For example, redirect to a specific error page
                 console.error(err);
                 // window.location.href = "/your-error-page-here";
-                const msg = { err , status: 'FAILED' };
+                const msg = { err, status: 'FAILED' };
                 window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(msg));
               },
             })
@@ -180,7 +180,9 @@ const Payment = function(settings, axios) {
     multibanco(options) {
       return this.requestPayment('multibanco', options)
         .then(({ data }) => data.response)
-        .then(({ multibanco, status, currency, amount }) => ({
+        .then(({
+          multibanco, status, currency, amount,
+        }) => ({
           multibanco: {
             entity: multibanco.entity,
             reference: multibanco.reference,
@@ -211,9 +213,8 @@ const Payment = function(settings, axios) {
       return this.axios.get('/payment/instances', query);
     },
 
-    enabledPaymentMethods(specification) {
-      const path = '/payment/enabled-methods' + (specification? `/${specification}`: '');
-      return this.axios.get(path);
+    enabledPaymentMethods(specification = '') {
+      return this.axios.get(`/payment/enabled-methods/${specification}`);
     },
 
   };
