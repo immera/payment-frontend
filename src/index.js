@@ -210,6 +210,12 @@ const Payment = function(settings, axios) {
     get(query) {
       return this.axios.get('/payment/instances', query);
     },
+
+    enabledPaymentMethods(specification) {
+      const path = '/payment/enabled-methods' + (specification? `/${specification}`: '')
+      return this.axios.get(path)
+    },
+
   };
 };
 
