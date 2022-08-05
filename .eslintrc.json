@@ -8,11 +8,14 @@
   ],
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2020
+    "ecmaVersion": "latest"
   },
   "rules": {
     "no-undef": "off",
-    "func-names": "off",
+    "semi": [
+      "error",
+      "always"
+    ],
     "arrow-parens": [
       "error",
       "as-needed"

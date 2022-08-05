@@ -17,20 +17,20 @@ const Payment = function(settings, axios) {
     },
 
     cardList() {
-      return this.axios.get('/payment/cards')
+      return this.axios.get('/payment/cards');
     },
     createNewCard(cardData) {
-      return this.axios.post('/payment/cards', {...cardData})
+      return this.axios.post('/payment/cards', {...cardData});
     },
     deleteCard(card) {
-      return this.axios.delete(`/payment/cards/${card}`)
+      return this.axios.delete(`/payment/cards/${card}`);
     },
     alipay(options) {
       return this.requestPayment('alipay', options).then(({ data }) => {
         this.stripe
           .confirmAlipayPayment(data.response.client_secret, {
             return_url: data.callback,
-          })
+          });
       });
     },
 
@@ -95,26 +95,26 @@ const Payment = function(settings, axios) {
                     .then(({data}) => data.response)
                     .then(({id}) => id)
                     .catch(console.error);
-                }
+                };
                 if(typeof(callback) == 'function') {
                   return callback().then(getOrderId).catch(err => {
-                    console.log('Error: ', err)
+                    console.log('Error: ', err);
                   });
                 }
-                return getOrderId()
+                return getOrderId();
               },
               onApprove(data) {
                 // This function captures the funds from the transaction.
-                const { orderID } = data
+                const { orderID } = data;
                 return paymentPkg.axios.post(`payment/paypal/order/${orderID}/capture`)
                   .then(order => {
-                    console.log(order)
-                    window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ status: 'SUCCESS' }))
+                    console.log(order);
+                    window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ status: 'SUCCESS' }));
                   })
                   .then(() => {
-                    window.location.href = paymentPkg.settings.callback
+                    window.location.href = paymentPkg.settings.callback;
                   })
-                  .catch(console.error)
+                  .catch(console.error);
                 // return actions.order.capture().then(details => {
                 //   // This function shows a transaction success message to your buyer.
                 //   // TODO emit event
@@ -138,7 +138,7 @@ const Payment = function(settings, axios) {
                 // For example, redirect to a specific error page
                 console.error(err);
                 // window.location.href = "/your-error-page-here";
-                const msg = { err , status: 'FAILED' }
+                const msg = { err , status: 'FAILED' };
                 window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(msg));
               },
             })
@@ -171,7 +171,7 @@ const Payment = function(settings, axios) {
     card(options) {
       return this.requestPayment('card', options)
         .then(res => {
-          console.log(res)
+          console.log(res);
           return res;
         })
         .catch(console.error);
@@ -212,8 +212,8 @@ const Payment = function(settings, axios) {
     },
 
     enabledPaymentMethods(specification) {
-      const path = '/payment/enabled-methods' + (specification? `/${specification}`: '')
-      return this.axios.get(path)
+      const path = '/payment/enabled-methods' + (specification? `/${specification}`: '');
+      return this.axios.get(path);
     },
 
   };
